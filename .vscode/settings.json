@@ -1,0 +1,22 @@
+{
+    "eslint.lintTask.enable": true,
+    "eslint.probe": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact",
+        "html",
+        "vue",
+        "markdown",
+        "svelte"
+    ],
+    "files.exclude": {
+        ".svelte-kit/": true,
+        "node_modules/": true,
+        ".eslintignore": true,
+        ".npmrc": true,
+        "package-lock.json": true,
+        "rollup.config.js": true,
+        "coverage": true
+    }
+}
