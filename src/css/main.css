@@ -1,0 +1,23 @@
+@import url("https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Maven+Pro:400,500,700,800|Rubik:300,400,500,700");
+
+:root {
+    --color-background: #0B120E;
+    --color-background-light: #111915;
+    --color-background-lighter: #19231E;
+    --color-background-lightest: #1F2A24;
+    --color-foreground-darkest: #88AC98;
+    --color-foreground-darker: #A7C4B4;
+    --color-foreground-dark: #C7DACF;
+    --color-foreground: #EFF5F3;
+
+    --color-green: #2ECC40;
+    --color-red: #FF4D00;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: "Rubik";
+}
