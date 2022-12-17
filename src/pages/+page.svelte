@@ -3,9 +3,9 @@
 
     import Character from "$components/Character.svelte";
 
-    import type { Player } from "$ts/player";
+    import type { Player } from "$ts/types/player";
 
-    import { getSlugFromTier, getTierFromRating } from "$ts/tier";
+    import { getSlugFromTier, getTierFromRating } from "$ts/types/tier";
 
     const players: Player[] = [
         {

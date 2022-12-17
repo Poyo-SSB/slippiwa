@@ -1,7 +1,7 @@
 <script lang="ts">
-    import type { Character } from "$ts/character";
+    import type { Character } from "$ts/types/character";
 
-    import { getSlugFromCharacter } from "$ts/character";
+    import { getSlugFromCharacter } from "$ts/types/character";
 
     const circumference = 2 * Math.PI * 18;
 
