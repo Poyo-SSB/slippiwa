@@ -2,6 +2,54 @@
     import "$css/main.css";
 
     import Character from "$components/Character.svelte";
+
+    import type { Player } from "$ts/player";
+
+    import { getSlugFromTier, getTierFromRating } from "$ts/tier";
+
+    const players: Player[] = [
+        {
+            name: "lula",
+
+            slippiName: "kum sussy todd",
+            slippiTag: "LULA",
+            slippiDiscriminator: "0",
+
+            characters: [
+                { character: "Falco", proportion: 0.946 },
+                { character: "Fox", proportion: 0.054 }
+            ],
+
+            rating: 1734.2,
+            tier: getTierFromRating(1734.2),
+
+            wins: 23,
+            losses: 17,
+        },
+        {
+            name: "Arya",
+
+            slippiName: "Poyo#4440",
+            slippiTag: "POYO",
+            slippiDiscriminator: "237",
+
+            characters: [
+                { character: "Fox", proportion: 0.870 },
+                { character: "Sheik", proportion: 0.116 },
+                { character: "Falco", proportion: 0.014 },
+                { character: "Mario", proportion: 0.001 },
+                { character: "Mario", proportion: 0.001 },
+                { character: "Mario", proportion: 0.001 },
+                { character: "Mario", proportion: 0.001 }
+            ],
+
+            rating: 1389.0,
+            tier: getTierFromRating(1389.0),
+
+            wins: 15,
+            losses: 14,
+        }
+    ];
 </script>
 
 <svelte:head>
@@ -23,19 +71,32 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td class="rank">1</td>
-                <td class="player">
-                    <p class="name"><a href="https://slippi.gg/user/lula-0">lula</a></p>
-                    <p class="slippi">LULA#0 <span class="slash">/</span> kum sussy todd</p>
-                </td>
-                <td class="characters">
-                    <Character character="Falco" proportion={0.946}/>
-                    <Character character="Fox" proportion={0.054}/>
-                </td>
-                <td class="rating">1734.2 <img src="/ranks/gold-3.svg" class="tier" alt="Gold 3" title="Gold 3"/></td>
-                <td class="wl"><span class="wins">23</span> <span class="slash">/</span> <span class="losses">17</span></td>
-            </tr>
+            {#each players as player, i}
+                <tr>
+                    <td class="rank">{i + 1}</td>
+                    <td class="player">
+                        <p class="name"><a href="https://slippi.gg/user/{player.slippiTag.toLowerCase()}-{player.slippiDiscriminator}">{player.name}</a></p>
+                        <p class="slippi">
+                            {player.slippiTag}#{player.slippiDiscriminator}
+                            <span class="slash">/</span>
+                            {player.slippiName}
+                        </p>
+                    </td>
+                    <td class="characters">
+                        {#each player.characters.slice(0, 3) as character}
+                            <Character character={character.character} proportion={character.proportion}/>{" "} <!-- lmao??? -->
+                        {/each}
+                        {#if player.characters.length > 3}
+                            <div class="extra">+{player.characters.length - 3}</div>
+                        {/if}
+                    </td>
+                    <td class="rating">
+                        {player.rating.toFixed(1)}
+                        <img src="/ranks/{getSlugFromTier(player.tier)}.svg" class="tier" alt="{player.tier}" title="{player.tier}"/>
+                    </td>
+                    <td class="wl"><span class="wins">{player.wins}</span> <span class="slash">/</span> <span class="losses">{player.losses}</span></td>
+                </tr>
+            {/each}
         </tbody>
     </table>
 </div>
@@ -117,6 +178,10 @@
         width: 80px;
     }
 
+    .characters {
+        width: 190px;
+    }
+
     /* column styles */
 
     th.rank, th.rating, th.wl {
@@ -144,6 +209,18 @@
     }
 
     .slash { color: var(--color-foreground-darkest); }
+
+    .extra {
+        font-size: 1.1em;
+        font-weight: 500;
+        color: var(--color-foreground-darkest);
+        display: inline-block;
+        padding-left: 2px;
+        width: 44px;
+        height: 44px;
+        line-height: 44px;
+        vertical-align: top;
+    }
 
     td.rating, td.wl {
         font-size: 18px;

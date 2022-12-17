@@ -55,6 +55,6 @@ const slugMap: Record<Character, string> = {
     "Zelda": "zelda"
 };
 
-export function getSlug(character: Character): string {
+export function getSlugFromCharacter(character: Character): string {
     return slugMap[character];
 }

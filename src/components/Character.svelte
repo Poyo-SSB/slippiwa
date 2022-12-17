@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { Character } from "$ts/character";
 
-    import { getSlug } from "$ts/character";
+    import { getSlugFromCharacter } from "$ts/character";
 
     const circumference = 2 * Math.PI * 18;
 
@@ -16,9 +16,8 @@
         <circle stroke="#50525A" stroke-width=4 fill="transparent" r=18 cx=22 cy=22></circle>
         <circle stroke="#2ECC40" stroke-width=4 fill="transparent" r=18 cx=22 cy=22 stroke-dasharray={`${dashArray} ${circumference - dashArray}`} stroke-dashoffset={circumference / 4}></circle>
     </svg>
-    <img src="/characters/{getSlug(character)}.png" alt={character}> 
+    <img src="/characters/{getSlugFromCharacter(character)}.png" alt={character}>
 </div>
-
 <style>
     .container {
         position: relative;
