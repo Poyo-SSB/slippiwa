@@ -1,5 +1,7 @@
 <script lang="ts">
     import "$css/main.css";
+
+    import Character from "$components/Character.svelte";
 </script>
 
 <svelte:head>
@@ -27,7 +29,10 @@
                     <p class="name"><a href="https://slippi.gg/user/lula-0">lula</a></p>
                     <p class="slippi">LULA#0 <span class="slash">/</span> kum sussy todd</p>
                 </td>
-                <td class="characters">fox</td>
+                <td class="characters">
+                    <Character character="Falco" proportion={0.946}/>
+                    <Character character="Fox" proportion={0.054}/>
+                </td>
                 <td class="rating">1734.2 <img src="/ranks/gold-3.svg" class="tier" alt="Gold 3" title="Gold 3"/></td>
                 <td class="wl"><span class="wins">23</span> <span class="slash">/</span> <span class="losses">17</span></td>
             </tr>
