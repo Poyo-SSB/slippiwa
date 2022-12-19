@@ -18,57 +18,50 @@
     <title>Washington Slippi Leaderboard</title>
 </svelte:head>
 
-<div class="container">
-    <!-- svelte-ignore a11y-missing-attribute -->
-    <h1><img src="/flag.svg" class="flag"/>Washington Slippi Leaderboard</h1>
+<!-- svelte-ignore a11y-missing-attribute -->
+<h1><img src="/flag.svg" class="flag"/>Washington Slippi Leaderboard</h1>
 
-    <table>
-        <thead>
+<table>
+    <thead>
+        <tr>
+            <th class="rank">Rank</th>
+            <th class="player">Player</th>
+            <th class="characters">Characters</th>
+            <th class="rating">Rating</th>
+            <th class="wl">W / L</th>
+        </tr>
+    </thead>
+    <tbody>
+        {#each players as player, i}
             <tr>
-                <th class="rank">Rank</th>
-                <th class="player">Player</th>
-                <th class="characters">Characters</th>
-                <th class="rating">Rating</th>
-                <th class="wl">W / L</th>
+                <td class="rank">{i + 1}</td>
+                <td class="player">
+                    <p class="name"><a href="https://slippi.gg/user/{player.slippiTag.toLowerCase()}-{player.slippiDiscriminator}">{player.name}</a></p>
+                    <p class="slippi">
+                        <span class="slippi-tag">{player.slippiTag}#{player.slippiDiscriminator}</span>
+                        <span class="slash">/</span>
+                        <span class="slippi-name">{player.slippiName}</span>
+                    </p>
+                </td>
+                <td class="characters">
+                    {#each player.characters.slice(0, 3) as character}
+                        <Character character={character.character} proportion={character.proportion}/>{" "} <!-- lmao??? -->
+                    {/each}
+                    {#if player.characters.length > 3}
+                        <div class="extra">+{player.characters.length - 3}</div>
+                    {/if}
+                </td>
+                <td class="rating">
+                    {player.rating?.toFixed(1) ?? "⸻"}
+                    <img src="/ranks/{getSlugFromTier(player.tier)}.svg" class="tier" alt="{player.tier}" title="{player.tier}"/>
+                </td>
+                <td class="wl"><span class:wins={player.wins}>{player.wins ?? "⸺"}</span> <span class="slash">/</span> <span class:losses={player.losses}>{player.losses ?? "⸺"}</span></td>
             </tr>
-        </thead>
-        <tbody>
-            {#each players as player, i}
-                <tr>
-                    <td class="rank">{i + 1}</td>
-                    <td class="player">
-                        <p class="name"><a href="https://slippi.gg/user/{player.slippiTag.toLowerCase()}-{player.slippiDiscriminator}">{player.name}</a></p>
-                        <p class="slippi">
-                            {player.slippiTag}#{player.slippiDiscriminator}
-                            <span class="slash">/</span>
-                            {player.slippiName}
-                        </p>
-                    </td>
-                    <td class="characters">
-                        {#each player.characters.slice(0, 3) as character}
-                            <Character character={character.character} proportion={character.proportion}/>{" "} <!-- lmao??? -->
-                        {/each}
-                        {#if player.characters.length > 3}
-                            <div class="extra">+{player.characters.length - 3}</div>
-                        {/if}
-                    </td>
-                    <td class="rating">
-                        {player.rating?.toFixed(1) ?? "⸻"}
-                        <img src="/ranks/{getSlugFromTier(player.tier)}.svg" class="tier" alt="{player.tier}" title="{player.tier}"/>
-                    </td>
-                    <td class="wl"><span class:wins={player.wins}>{player.wins ?? "⸺"}</span> <span class="slash">/</span> <span class:losses={player.losses}>{player.losses ?? "⸺"}</span></td>
-                </tr>
-            {/each}
-        </tbody>
-    </table>
-</div>
+        {/each}
+    </tbody>
+</table>
 
 <style>
-    .container {
-        max-width: 900px;
-        margin: 0 auto;
-    }
-
     .flag {
         display: inline-block;
         vertical-align: middle;
@@ -86,6 +79,8 @@
 
     table {
         width: 100%;
+        max-width: 940px;
+        margin: auto;
         background-color: var(--color-background-light);
         border-radius: 4px;
         table-layout: fixed;
@@ -134,7 +129,7 @@
     }
 
     .player {
-        min-width: 280px;
+        width: 220px;
     }
 
     .rating {
@@ -168,11 +163,15 @@
     .name {
         font-size: 18px;
         font-weight: 700;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .slippi {
         color: var(--color-foreground-darker);
         font-size: 12px;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .slash { color: var(--color-foreground-darkest); }
@@ -212,4 +211,42 @@
 
     .wins { color: var(--color-green); }
     .losses { color: var(--color-red); }
+
+    /*
+    mess with columns by width, for mobile etc.
+    sorry i don't have a better solution than just hiding as things get smaller
+    */
+
+    @media (max-width: 940px) {
+        .tier {
+            display: block;
+            margin: 6px auto 0;
+        }
+
+        .rating {
+            width: 70px;
+        }
+
+        tr:nth-child(odd):not(thead > tr) {
+            background-color: var(--color-background-lighter);
+        }
+    }
+
+    @media (max-width: 770px) {
+        .wl {
+            display: none;
+        }
+    }
+
+    @media (max-width: 656px) {
+        .characters {
+            display: none;
+        }
+    }
+
+    @media (max-width: 490px) {
+        .player {
+            width: auto;
+        }
+    }
 </style>
