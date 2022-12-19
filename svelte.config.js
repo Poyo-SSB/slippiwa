@@ -9,7 +9,7 @@ const config = {
 		adapter: vercel(),
 
 		files: {
-			routes: "src/pages"
+			routes: "src/routes"
 		}
 	}
 };

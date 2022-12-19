@@ -1,0 +1,22 @@
+query GetPlayerByCode($code: String) {
+  getConnectCode(code: $code) {
+    user {
+      displayName
+      connectCode {
+        code
+      }
+      status
+      rankedNetplayProfile {
+        ratingOrdinal
+        ratingUpdateCount
+        wins
+        losses
+        continent
+        characters {
+          character
+          gameCount
+        }
+      }
+    }
+  }
+}

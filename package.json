@@ -26,6 +26,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"limiter": "2.0.1",
 		"mongodb": "^4.12.1"
 	}
 }

@@ -5,51 +5,13 @@
 
     import type { Player } from "$ts/types/player";
 
-    import { getSlugFromTier, getTierFromRating } from "$ts/types/tier";
+    import { getSlugFromTier } from "$ts/types/tier";
 
-    const players: Player[] = [
-        {
-            name: "lula",
+    import type { PageData } from "./$types";
 
-            slippiName: "kum sussy todd",
-            slippiTag: "LULA",
-            slippiDiscriminator: "0",
+    export let data: PageData;
 
-            characters: [
-                { character: "Falco", proportion: 0.946 },
-                { character: "Fox", proportion: 0.054 }
-            ],
-
-            rating: 1734.2,
-            tier: getTierFromRating(1734.2),
-
-            wins: 23,
-            losses: 17,
-        },
-        {
-            name: "Arya",
-
-            slippiName: "Poyo#4440",
-            slippiTag: "POYO",
-            slippiDiscriminator: "237",
-
-            characters: [
-                { character: "Fox", proportion: 0.870 },
-                { character: "Sheik", proportion: 0.116 },
-                { character: "Falco", proportion: 0.014 },
-                { character: "Mario", proportion: 0.001 },
-                { character: "Mario", proportion: 0.001 },
-                { character: "Mario", proportion: 0.001 },
-                { character: "Mario", proportion: 0.001 }
-            ],
-
-            rating: 1389.0,
-            tier: getTierFromRating(1389.0),
-
-            wins: 15,
-            losses: 14,
-        }
-    ];
+    const players: Player[] = data.players;
 </script>
 
 <svelte:head>
@@ -153,6 +115,7 @@
     }
 
     a:link {
+        color: var(--color-foreground);
         text-decoration: none;
     }
 
@@ -171,7 +134,7 @@
     }
 
     .rating {
-        width: 130px;
+        width: 140px;
     }
 
     .wl {
@@ -225,14 +188,15 @@
     td.rating, td.wl {
         font-size: 18px;
         font-weight: 700;
+        font-variant-numeric: tabular-nums;
         text-align: center;
     }
 
     .tier {
         display: inline-block;
         vertical-align: middle;
-        padding-left: 8px;
-        padding-bottom: 5px;
+        margin-left: 8px;
+        margin-bottom: 5px;
         height: 46px;
         width: 56px;
     }
