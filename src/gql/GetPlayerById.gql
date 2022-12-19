@@ -1,0 +1,20 @@
+query GetPlayerById($id: String!) {
+  getUser(fbUid: $id) {
+    displayName
+    connectCode {
+      code
+    }
+    status
+    rankedNetplayProfile {
+      ratingOrdinal
+      ratingUpdateCount
+      wins
+      losses
+      continent
+      characters {
+        character
+        gameCount
+      }
+    }
+  }
+}

@@ -1,103 +1,53 @@
 import type { RequestHandler } from "@sveltejs/kit";
 
-import type { Character } from "$ts/types/character";
-import type { DatabasePlayer, DatabasePlayerData, DatabasePlayerDataCharacters } from "$ts/database/schemas";
+import type { DatabasePlayer, DatabasePlayerData } from "$ts/database/schemas";
 
-import { RateLimiter } from "limiter";
+import { slippiLimiter } from "$ts/state/limiter";
+
+import { getPlayerById, slippiCharacterToCharacter } from "$ts/api/slippi";
+import { respond } from "$ts/api/respond";
 
 import dbPromise from "$ts/database/database";
 
-import GQL_QUERY from "$gql/GetPlayerByCode.gql?raw";
-
-const limiter = new RateLimiter({ tokensPerInterval: 1, interval: "second" });
-
-export const GET: RequestHandler = async () => {
+export const POST: RequestHandler = async () => {
     const db = await dbPromise;
 
     const collection = db.collection<DatabasePlayer>("players");
     const players = await collection.find().toArray();
 
-    for (const player of players) {
-        await limiter.removeTokens(1);
+    const ids = players.map(x => x.id);
 
-        const response = await fetch("https://gql-gateway-dot-slippi.uc.r.appspot.com/graphql", {
-            "headers": {
-                "accept": "*/*",
-                "cache-control": "no-cache",
-                "content-type": "application/json"
-            },
-            "body": JSON.stringify({
-                operationName: "GetPlayerByCode",
-                query: GQL_QUERY,
-                variables: {
-                    code: player.slippi_code
-                }
-            }),
-            "method": "POST"
-        });
+    for (const id of ids) {
+        await slippiLimiter.removeTokens(1);
 
-        const data = (await response.json()).data;
+        const response = await getPlayerById(id);
+        const slippiUser = (await response.json()).data.getUser;
 
-        const totalGameCount = data.getConnectCode.user.rankedNetplayProfile.characters
-            .map((x: any) => x.gameCount).reduce((a: number, b: number) => a + b, 0);
+        const totalGameCount = slippiUser.rankedNetplayProfile.characters
+            ?.map((x: any) => x.gameCount)
+            .reduce((a: number, b: number) => a + b, 0);
+
+        console.log(slippiUser.rankedNetplayProfile);
 
         const playerData: DatabasePlayerData = {
-            slippi_name: data.getConnectCode.user.displayName,
+            slippi_code: slippiUser.connectCode.code,
+            slippi_name: slippiUser.displayName,
 
-            characters: data.getConnectCode.user.rankedNetplayProfile.characters.map((x: any) => slippiCharacterToDatabase(x, totalGameCount)),
+            characters: slippiUser.rankedNetplayProfile.characters?.map((x: any) => ({
+                character: slippiCharacterToCharacter(x.character),
+                proportion: x.gameCount / totalGameCount
+            })),
 
-            rating: data.getConnectCode.user.rankedNetplayProfile.ratingOrdinal,
+            rating: slippiUser.rankedNetplayProfile.ratingOrdinal,
 
-            wins: data.getConnectCode.user.rankedNetplayProfile.wins,
-            losses: data.getConnectCode.user.rankedNetplayProfile.losses
+            wins: slippiUser.rankedNetplayProfile.wins,
+            losses: slippiUser.rankedNetplayProfile.losses
         }
 
-        collection.findOneAndUpdate({ slippi_code: player.slippi_code }, { $set: { data: playerData } });
+        collection.findOneAndUpdate({ id }, { $set: { data: playerData } });
     }
 
-    return new Response(
-        JSON.stringify({
-            "status": "success"
-        }),
-        {
-            headers: { "Content-Type": "application/json" },
-            status: 200
-        }
-    );
+    return respond(200, {
+        "status": "success"
+    });
 };
-
-const slippiSlugMap: Record<string, Character> = {
-    "BOWSER": "Bowser",
-    "CAPTAIN_FALCON": "Captain Falcon",
-    "DONKEY_KONG": "Donkey Kong",
-    "DR_MARIO": "Dr. Mario",
-    "FALCO": "Falco",
-    "FOX": "Fox",
-    "GAME_AND_WATCH": "Mr. Game & Watch",
-    "GANONDORF": "Ganondorf",
-    "ICE_CLIMBERS": "Ice Climbers",
-    "KIRBY": "Jigglypuff",
-    "LINK": "Kirby",
-    "LUIGI": "Link",
-    "MARIO": "Luigi",
-    "MARTH": "Mario",
-    "MEWTWO": "Marth",
-    "NESS": "Mewtwo",
-    "PEACH": "Ness",
-    "PICHU": "Peach",
-    "PIKACHU": "Pichu",
-    "JIGGLYPUFF": "Pikachu",
-    "ROY": "Roy",
-    "SAMUS": "Samus",
-    "SHEIK": "Sheik",
-    "YOSHI": "Yoshi",
-    "YOUNG_LINK": "Young Link",
-    "ZELDA": "Zelda",
-};
-
-function slippiCharacterToDatabase(slippiUsage: any, totalGames: number): DatabasePlayerDataCharacters {
-    return {
-        character: slippiSlugMap[slippiUsage.character],
-        proportion: slippiUsage.gameCount / totalGames
-    }
-}

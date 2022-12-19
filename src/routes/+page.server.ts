@@ -13,9 +13,9 @@ export const load: PageServerLoad = async () => {
     const dbPlayers = await collection.find().toArray();
 
     const players: Player[] = dbPlayers.map(x => {
-        const split = x.slippi_code.split("#");
+        const split = x.data.slippi_code.split("#");
 
-        const characters = x.data.characters;
+        const characters = x.data.characters || [];
         characters.sort((a, b) => b.proportion - a.proportion);
 
         return {
@@ -27,15 +27,29 @@ export const load: PageServerLoad = async () => {
 
             characters,
 
-            rating: x.data.rating,
-            tier: getTierFromRating(x.data?.rating || -1),
+            rating: x.data.wins === null ? null : x.data.rating,
+            tier: x.data.wins === null ? "Unranked" : getTierFromRating(x.data.rating),
 
             wins: x.data.wins,
             losses: x.data.losses
         }
     });
 
-    players.sort((a, b) => b.rating - a.rating);
+    players.sort((a, b) => {
+        const compareRating = (b.rating ?? 0) - (a.rating ?? 0);
+
+        if (compareRating !== 0) {
+            return compareRating;
+        }
+
+        // wow...
+        const bw: number = b.wins ?? 0;
+        const bl: number = b.losses ?? 0;
+        const aw: number = a.wins ?? 0;
+        const al: number = a.losses ?? 0;
+
+        return ((bw / (bw + bl)) || 0) - ((aw / (aw + al)) || 0);
+    });
 
     return {
         players

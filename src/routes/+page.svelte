@@ -53,10 +53,10 @@
                         {/if}
                     </td>
                     <td class="rating">
-                        {player.rating.toFixed(1)}
+                        {player.rating?.toFixed(1) ?? "⸻"}
                         <img src="/ranks/{getSlugFromTier(player.tier)}.svg" class="tier" alt="{player.tier}" title="{player.tier}"/>
                     </td>
-                    <td class="wl"><span class="wins">{player.wins}</span> <span class="slash">/</span> <span class="losses">{player.losses}</span></td>
+                    <td class="wl"><span class="wins">{player.wins ?? "⸺"}</span> <span class="slash">/</span> <span class="losses">{player.losses ?? "⸺"}</span></td>
                 </tr>
             {/each}
         </tbody>

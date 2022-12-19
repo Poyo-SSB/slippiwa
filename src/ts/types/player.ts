@@ -15,9 +15,9 @@ export interface Player {
 
     characters: PlayedCharacter[];
 
-    rating: number;
+    rating: number | null;
     tier: Tier;
 
-    wins: number;
-    losses: number;
+    wins: number | null;
+    losses: number | null;
 }
