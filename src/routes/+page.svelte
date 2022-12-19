@@ -56,7 +56,7 @@
                         {player.rating?.toFixed(1) ?? "⸻"}
                         <img src="/ranks/{getSlugFromTier(player.tier)}.svg" class="tier" alt="{player.tier}" title="{player.tier}"/>
                     </td>
-                    <td class="wl"><span class="wins">{player.wins ?? "⸺"}</span> <span class="slash">/</span> <span class="losses">{player.losses ?? "⸺"}</span></td>
+                    <td class="wl"><span class:wins={player.wins}>{player.wins ?? "⸺"}</span> <span class="slash">/</span> <span class:losses={player.losses}>{player.losses ?? "⸺"}</span></td>
                 </tr>
             {/each}
         </tbody>
@@ -133,6 +133,10 @@
         width: 50px;
     }
 
+    .player {
+        min-width: 280px;
+    }
+
     .rating {
         width: 140px;
     }
@@ -188,6 +192,7 @@
     td.rating, td.wl {
         font-size: 18px;
         font-weight: 700;
+        font-family: "Rubik", "Poyodash";
         font-variant-numeric: tabular-nums;
         text-align: center;
     }
@@ -199,6 +204,10 @@
         margin-bottom: 5px;
         height: 46px;
         width: 56px;
+    }
+
+    td.wl {
+        color: var(--color-foreground-darkest);
     }
 
     .wins { color: var(--color-green); }
