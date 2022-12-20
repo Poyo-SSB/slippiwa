@@ -2,7 +2,9 @@
     import { page } from "$app/stores";
 
     const map: Record<number, string> = {
-        404: "Take me back to the leaderboard!"
+        403: "no",
+        404: "Take me back to the leaderboard!",
+        500: "Uh oh!!! Please report this!!!!!!"
     };
 </script>
 

@@ -30,3 +30,7 @@ export interface DatabasePlayerDataCharacters {
 export interface DatabaseStats {
     lastUpdate: Date;
 }
+
+export interface DatabaseBan {
+    ip: string;
+}

@@ -1,6 +1,6 @@
 import type { RequestEvent, RequestHandler } from "./$types";
 
-import type { DatabasePlayer, DatabasePlayerData } from "$ts/database/schemas";
+import type { DatabaseBan, DatabasePlayer, DatabasePlayerData } from "$ts/database/schemas";
 
 import { slippiLimiter } from "$ts/state/limiter";
 
@@ -10,6 +10,17 @@ import { respond } from "$ts/api/respond";
 import dbPromise from "$ts/database/database";
 
 export const POST: RequestHandler = async (event: RequestEvent) => {
+    const db = await dbPromise;
+
+    const bansCollection = db.collection<DatabaseBan>("bans");
+
+    if (await bansCollection.findOne({ ip: event.getClientAddress() })) {
+        return respond(403, {
+            "status": "error",
+            "message": "no"
+        });
+    }
+
     const json = await event.request.json();
 
     if (!json.code) {
@@ -25,8 +36,6 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
             "message": "No name provided!"
         });
     }
-    
-    const db = await dbPromise;
 
     const collection = db.collection<DatabasePlayer>("players");
 
