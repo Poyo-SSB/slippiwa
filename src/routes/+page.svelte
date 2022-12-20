@@ -3,9 +3,9 @@
 
     import { onMount } from "svelte";
 
-    import { DateTime } from "luxon";
-
     import Character from "$components/Character.svelte";
+
+    import { DateTime } from "luxon";
 
     import { getSlugFromTier } from "$ts/types/tier";
 
@@ -46,7 +46,7 @@
             <tr>
                 <td class="rank">{i + 1}</td>
                 <td class="player">
-                    <p class="name"><a href="https://slippi.gg/user/{player.slippiTag.toLowerCase()}-{player.slippiDiscriminator}">{player.name}</a></p>
+                    <p class="name"><a name="{player.slippiTag.toLowerCase()}-{player.slippiDiscriminator}" href="https://slippi.gg/user/{player.slippiTag.toLowerCase()}-{player.slippiDiscriminator}">{player.name}</a></p>
                     <p class="slippi">
                         <span class="slippi-tag">{player.slippiTag}#{player.slippiDiscriminator}</span>
                         <span class="slash">/</span>
@@ -137,6 +137,11 @@
 
     a:hover, a:focus {
         color: var(--color-foreground-dark);
+    }
+
+    a:focus-visible {
+        outline: none;
+        text-decoration: underline;
     }
 
     /* column widths */
