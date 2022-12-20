@@ -47,7 +47,9 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
     const playerResponse = await getPlayerById(id);
     const slippiUser = (await playerResponse.json()).data.getUser;
 
-    const totalGameCount = slippiUser.rankedNetplayProfile.ratingUpdateCount;
+    const totalGameCount = slippiUser.rankedNetplayProfile.characters
+        ?.map((x: any) => x.gameCount)
+        .reduce((a: number, b: number) => a + b, 0);
 
     const playerData: DatabasePlayerData = {
         slippi_code: slippiUser.connectCode.code,
