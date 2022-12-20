@@ -26,6 +26,17 @@
 
     onMount(() => {
         setInterval(() => ago = lastUpdate.toRelative(), 500);
+
+        if (window.location.hash) {
+            const slug = window.location.hash.substring(1);
+
+            const anchor = document.querySelector(`a[name="${slug}"]`);
+            const row = anchor?.parentElement?.parentElement; // all because firefox doesn't support :has by default...
+
+            if (row) {
+                row.style.animation = "";
+            }
+        }
     });
 </script>
 
@@ -49,11 +60,11 @@
     </thead>
     <tbody>
         {#each players as player, i}
-            <!-- svelte-ignore a11y-missing-content -->
-            <a class="anchor" name={slug(player)}/>
-            <tr>
+            <tr class="animate" style="animation: none;">
                 <td class="rank">{i + 1}</td>
                 <td class="player">
+                    <!-- svelte-ignore a11y-missing-content -->
+                    <a class="anchor" name={slug(player)} />
                     <p class="name"><a href="https://slippi.gg/user/{slug(player)}">{player.name}</a></p>
                     <p class="slippi">
                         <span class="slippi-tag">{player.slippiTag}#{player.slippiDiscriminator}</span>
@@ -101,6 +112,12 @@
         color: var(--color-foreground-dark);
     }
 
+    .anchor {
+        position: absolute;
+        top: -12px;
+        left: 0;
+    }
+
     table {
         width: 100%;
         max-width: 940px;
@@ -118,6 +135,10 @@
         font-weight: 500;
         text-align: left;
         text-transform: uppercase;
+    }
+
+    td {
+        position: relative;
     }
 
     th, td {
@@ -208,6 +229,11 @@
         vertical-align: top;
     }
 
+    td.characters {
+        padding-top: 11px;
+        padding-bottom: 1px;
+    }
+
     td.rating, td.wl {
         font-size: 18px;
         font-weight: 700;
@@ -231,6 +257,19 @@
 
     .wins { color: var(--color-green); }
     .losses { color: var(--color-red); }
+
+    /* animation for anchors */
+
+    .animate {
+        animation-name: animate;
+        animation-duration: 2.5s;
+        animation-timing-function: ease-in;
+    }
+
+    @keyframes animate {
+        0% { background-color: var(--color-background-lightest); }
+        100% { background-color: var(--color-background-light); }
+    }
 
     /*
     mess with columns by width, for mobile etc.
