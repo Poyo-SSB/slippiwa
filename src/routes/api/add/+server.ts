@@ -1,4 +1,4 @@
-import type { RequestEvent, RequestHandler } from "@sveltejs/kit";
+import type { RequestEvent, RequestHandler } from "./$types";
 
 import type { DatabasePlayer, DatabasePlayerData } from "$ts/database/schemas";
 
@@ -76,7 +76,7 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
 
     collection.insertOne(player);
 
-    return respond(200, {
+    return respond(201, {
         "status": "success"
     });
 }

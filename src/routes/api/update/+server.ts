@@ -1,4 +1,4 @@
-import type { RequestHandler } from "@sveltejs/kit";
+import type { RequestEvent, RequestHandler } from "./$types";
 
 import type { DatabasePlayer, DatabasePlayerData, DatabaseStats } from "$ts/database/schemas";
 
@@ -7,9 +7,26 @@ import { slippiLimiter } from "$ts/state/limiter";
 import { getPlayerById, slippiCharacterToCharacter } from "$ts/api/slippi";
 import { respond } from "$ts/api/respond";
 
+import { API_SECRET } from "$env/static/private";
+
 import dbPromise from "$ts/database/database";
 
-export const POST: RequestHandler = async () => {
+export const POST: RequestHandler = async (event: RequestEvent) => {
+    if (event.request.headers.get("authorization") !== `Bearer ${API_SECRET}`) {
+        return respond(401, {
+            "status": "error",
+            "message": "nice try"
+        });
+    }
+
+    process(event); // intentionally not awaited!
+
+    return respond(202, {
+        "status": "success"
+    });
+};
+
+async function process(event: RequestEvent) {
     const db = await dbPromise;
 
     const playersCollection = db.collection<DatabasePlayer>("players");
@@ -46,9 +63,5 @@ export const POST: RequestHandler = async () => {
     }
 
     const statsCollection = db.collection<DatabaseStats>("stats");
-    statsCollection.findOneAndUpdate({}, { $set: { lastUpdate: new Date() } })
-
-    return respond(200, {
-        "status": "success"
-    });
-};
+    statsCollection.findOneAndUpdate({}, { $set: { lastUpdate: new Date() } });
+}
