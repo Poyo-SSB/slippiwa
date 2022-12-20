@@ -5,6 +5,8 @@
 
     import Character from "$components/Character.svelte";
 
+    import type { Player } from "$ts/types/player";
+
     import { DateTime } from "luxon";
 
     import { getSlugFromTier } from "$ts/types/tier";
@@ -17,6 +19,10 @@
     const lastUpdate = DateTime.fromJSDate(data.lastUpdate);
 
     let ago = lastUpdate.toRelative();
+
+    function slug(player: Player) {
+        return `${player.slippiTag.toLowerCase()}-${player.slippiDiscriminator}`;
+    }
 
     onMount(() => {
         setInterval(() => ago = lastUpdate.toRelative(), 500);
@@ -43,10 +49,12 @@
     </thead>
     <tbody>
         {#each players as player, i}
+            <!-- svelte-ignore a11y-missing-content -->
+            <a class="anchor" name={slug(player)}/>
             <tr>
                 <td class="rank">{i + 1}</td>
                 <td class="player">
-                    <p class="name"><a name="{player.slippiTag.toLowerCase()}-{player.slippiDiscriminator}" href="https://slippi.gg/user/{player.slippiTag.toLowerCase()}-{player.slippiDiscriminator}">{player.name}</a></p>
+                    <p class="name"><a href="https://slippi.gg/user/{slug(player)}">{player.name}</a></p>
                     <p class="slippi">
                         <span class="slippi-tag">{player.slippiTag}#{player.slippiDiscriminator}</span>
                         <span class="slash">/</span>
@@ -127,20 +135,10 @@
     }
 
     a:link {
-        color: var(--color-foreground);
         text-decoration: none;
     }
 
-    a:visited {
-        color: var(--color-foreground);
-    }
-
-    a:hover, a:focus {
-        color: var(--color-foreground-dark);
-    }
-
     a:focus-visible {
-        outline: none;
         text-decoration: underline;
     }
 

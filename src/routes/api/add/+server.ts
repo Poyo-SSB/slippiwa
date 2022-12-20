@@ -15,14 +15,14 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
     if (!json.code) {
         return respond(400, {
             "status": "error",
-            "message": "no code provided!"
+            "message": "No code provided!"
         });
     }
 
     if (!json.name) {
         return respond(400, {
             "status": "error",
-            "message": "no name provided!"
+            "message": "No name provided!"
         });
     }
     
@@ -35,12 +35,19 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
     const response = await getIdByCode(json.code);
     const data = (await response.json()).data;
 
+    if (!data.getConnectCode) {
+        return respond(404, {
+            "status": "error",
+            "message": "Player not found!"
+        });
+    }
+
     const id = data.getConnectCode.user.fbUid;
 
     if (await collection.findOne({ id })) {
         return respond(409, {
             "status": "error",
-            "message": "player already exists!"
+            "message": "Player already exists!"
         });
     }
 
@@ -79,6 +86,9 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
     collection.insertOne(player);
 
     return respond(201, {
-        "status": "success"
+        "status": "success",
+        "data": {
+            "slug": slippiUser.connectCode.code.toLowerCase().replace("#", "-")
+        }
     });
 }

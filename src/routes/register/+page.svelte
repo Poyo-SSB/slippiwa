@@ -2,6 +2,8 @@
     import "$css/main.css";
     import "$css/center.css";
 
+    import { PUBLIC_CONTACT } from "$env/static/public";
+    
     let code = "";
     let name = "";
 
@@ -10,14 +12,29 @@
     $: tagValid = /^[A-Z0-9]+#[0-9]+$/.test(code);
     $: nameValid = name.length > 0;
 
-    function register() {
-        fetch("/api/add", {
+    let promise: Promise<Response> | null = null;
+    let lastResult: any = null;
+
+    async function register() {
+        lastResult = null;
+
+        promise = fetch("/api/add", {
             "headers": {
                 "Content-Type": "application/json"
             },
             "body": JSON.stringify({ code, name }),
             "method": "POST"
         });
+
+        const response = await promise;
+
+        lastResult = await response.json();
+
+        if (lastResult?.status === "success") {
+            window.location.href = "/#" + lastResult.data.slug;
+        }
+
+        promise = null;
     }
 </script>
 
@@ -25,6 +42,7 @@
     <div class="content">
         <h1>Register player</h1>
         <p>Please only register Washington players. Please?</p>
+        <p>Contact {PUBLIC_CONTACT} to have your name changed or to be removed.</p>
         <table>
             <tr>
                 <td>Slippi code</td>
@@ -35,7 +53,18 @@
                 <td><input bind:value={name} class:error={!nameValid} maxlength=16 placeholder="Plup"/></td>
             </tr>
         </table>
-        <button disabled={!(tagValid && nameValid)} on:click={register}>Register</button>
+        <p>
+            <button disabled={!(tagValid && nameValid) || promise !== null} on:click={register}>{promise ? "· · ·" : "Register"}</button>
+            {#if lastResult !== null}
+                {#if lastResult?.status === "error"}
+                    {lastResult.message}
+                {:else if lastResult?.status === "success"}
+                    Success!
+                {:else}
+                    Something truly terrible has happened. Please report this.
+                {/if}
+            {/if}
+        </p>
     </div>
 </div>
 
@@ -80,19 +109,14 @@
 
     button {
         font-size: 1.1em;
-        display: block;
         color: var(--color-foreground-dark);
         background-color: var(--color-background-lighter);
+        width: 98px;
         padding: 8px 14px;
-        margin: 10px auto 0;
+        margin-right: 8px;
 
         transition-property: color, background-color;
         transition-duration: 100ms;
-    }
-
-    button:disabled {
-        color: var(--color-foreground-darkest);
-        background-color: var(--color-background-light);
     }
 
     button:hover {
@@ -103,5 +127,10 @@
     button:active {
         color: var(--color-foreground-darker);
         background-color: var(--color-background-lighter);
+    }
+
+    button:disabled {
+        color: var(--color-foreground-darkest);
+        background-color: var(--color-background-light);
     }
 </style>

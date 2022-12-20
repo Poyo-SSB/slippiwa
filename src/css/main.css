@@ -32,3 +32,19 @@ html, body {
     color: var(--color-foreground);
     font-family: "Rubik";
 }
+
+a:link {
+    color: var(--color-foreground);
+}
+
+a:visited {
+    color: var(--color-foreground);
+}
+
+a:hover, a:focus {
+    color: var(--color-foreground-dark);
+}
+
+a:focus-visible {
+    outline: none;
+}
