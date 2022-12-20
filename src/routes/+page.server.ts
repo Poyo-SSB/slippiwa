@@ -1,6 +1,6 @@
 import type { PageServerLoad } from "./$types";
 
-import type { DatabasePlayer } from "$ts/database/schemas";
+import type { DatabasePlayer, DatabaseStats } from "$ts/database/schemas";
 import type { Player } from "$ts/types/player";
 
 import dbPromise from "$ts/database/database";
@@ -9,8 +9,8 @@ import { getTierFromRating } from "$ts/types/tier";
 export const load: PageServerLoad = async () => {
     const db = await dbPromise;
 
-    const collection = db.collection<DatabasePlayer>("players");
-    const dbPlayers = await collection.find().toArray();
+    const playersCollection = db.collection<DatabasePlayer>("players");
+    const dbPlayers = await playersCollection.find().toArray();
 
     const players: Player[] = dbPlayers.map(x => {
         const split = x.data.slippi_code.split("#");
@@ -51,7 +51,11 @@ export const load: PageServerLoad = async () => {
         return ((bw / (bw + bl)) || 0) - ((aw / (aw + al)) || 0);
     });
 
+    const statsCollection = db.collection<DatabaseStats>("stats");
+    const lastUpdate = (await statsCollection.findOne({}))!.lastUpdate;
+
     return {
-        players
+        players,
+        lastUpdate
     };
 };

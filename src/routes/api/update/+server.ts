@@ -1,6 +1,6 @@
 import type { RequestHandler } from "@sveltejs/kit";
 
-import type { DatabasePlayer, DatabasePlayerData } from "$ts/database/schemas";
+import type { DatabasePlayer, DatabasePlayerData, DatabaseStats } from "$ts/database/schemas";
 
 import { slippiLimiter } from "$ts/state/limiter";
 
@@ -12,8 +12,8 @@ import dbPromise from "$ts/database/database";
 export const POST: RequestHandler = async () => {
     const db = await dbPromise;
 
-    const collection = db.collection<DatabasePlayer>("players");
-    const players = await collection.find().toArray();
+    const playersCollection = db.collection<DatabasePlayer>("players");
+    const players = await playersCollection.find().toArray();
 
     const ids = players.map(x => x.id);
 
@@ -26,8 +26,6 @@ export const POST: RequestHandler = async () => {
         const totalGameCount = slippiUser.rankedNetplayProfile.characters
             ?.map((x: any) => x.gameCount)
             .reduce((a: number, b: number) => a + b, 0);
-
-        console.log(slippiUser.rankedNetplayProfile);
 
         const playerData: DatabasePlayerData = {
             slippi_code: slippiUser.connectCode.code,
@@ -44,8 +42,11 @@ export const POST: RequestHandler = async () => {
             losses: slippiUser.rankedNetplayProfile.losses
         }
 
-        collection.findOneAndUpdate({ id }, { $set: { data: playerData } });
+        playersCollection.findOneAndUpdate({ id }, { $set: { data: playerData } });
     }
+
+    const statsCollection = db.collection<DatabaseStats>("stats");
+    statsCollection.findOneAndUpdate({}, { $set: { lastUpdate: new Date() } })
 
     return respond(200, {
         "status": "success"

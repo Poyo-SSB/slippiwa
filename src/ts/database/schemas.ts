@@ -26,3 +26,7 @@ export interface DatabasePlayerDataCharacters {
     character: Character;
     proportion: number;
 };
+
+export interface DatabaseStats {
+    lastUpdate: Date;
+}

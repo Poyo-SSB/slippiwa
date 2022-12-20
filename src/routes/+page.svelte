@@ -1,9 +1,11 @@
 <script lang="ts">
     import "$css/main.css";
 
-    import Character from "$components/Character.svelte";
+    import { onMount } from "svelte";
 
-    import type { Player } from "$ts/types/player";
+    import { DateTime } from "luxon";
+
+    import Character from "$components/Character.svelte";
 
     import { getSlugFromTier } from "$ts/types/tier";
 
@@ -11,7 +13,14 @@
 
     export let data: PageData;
 
-    const players: Player[] = data.players;
+    const players = data.players;
+    const lastUpdate = DateTime.fromJSDate(data.lastUpdate);
+
+    let ago = lastUpdate.toRelative();
+
+    onMount(() => {
+        setInterval(() => ago = lastUpdate.toRelative(), 500);
+    });
 </script>
 
 <svelte:head>
@@ -20,6 +29,7 @@
 
 <!-- svelte-ignore a11y-missing-attribute -->
 <h1><img src="/flag.svg" class="flag"/>Washington Slippi Leaderboard</h1>
+<p class="ago">Last updated {ago}</p>
 
 <table>
     <thead>
@@ -75,12 +85,19 @@
         font-size: 2.6em;
         line-height: 1em;
         text-align: center;
+        margin-bottom: 18px;
+    }
+
+    .ago {
+        text-align: center;
+        color: var(--color-foreground-dark);
     }
 
     table {
         width: 100%;
         max-width: 940px;
         margin: auto;
+        margin-top: 26px;
         background-color: var(--color-background-light);
         border-radius: 4px;
         table-layout: fixed;
