@@ -76,6 +76,10 @@
     .container * {
         box-sizing: border-box;
     }
+
+    .content {
+        padding: 16px;
+    }
     
     table, input {
         width: 100%;
