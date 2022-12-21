@@ -1,5 +1,6 @@
 export type Tier =
     "Unranked" |
+    "Pending" |
     "Bronze 1" |
     "Bronze 2" |
     "Bronze 3" |
@@ -50,6 +51,7 @@ const ratingMap: RatingBracket[] = [
 
 const slugMap: Record<Tier, string> = {
     "Unranked": "unranked",
+    "Pending": "pending",
     "Bronze 1": "bronze-1",
     "Bronze 2": "bronze-2",
     "Bronze 3": "bronze-3",
@@ -81,5 +83,6 @@ export function getTierFromRating(rating: number) {
             return bracket.tier;
         }
     }
+
     return "Unranked";
 }

@@ -2,6 +2,7 @@ import type { PageServerLoad } from "./$types";
 
 import type { DatabasePlayer, DatabaseStats } from "$ts/database/schemas";
 import type { Player } from "$ts/types/player";
+import type { Tier } from "$ts/types/tier";
 
 import dbPromise from "$ts/database/database";
 import { getTierFromRating } from "$ts/types/tier";
@@ -18,6 +19,18 @@ export const load: PageServerLoad = async () => {
         const characters = x.data.characters || [];
         characters.sort((a, b) => b.proportion - a.proportion);
 
+        let tier: Tier = "Unranked";
+
+        if (x.data.wins !== null) {
+            if (x.data.sets < 5) {
+                tier = "Pending";
+            } else {
+                tier = getTierFromRating(x.data.rating);
+            }
+        }
+
+        const rating = x.data.sets >= 5 ? x.data.rating : null;
+
         return {
             name: x.name,
 
@@ -27,8 +40,10 @@ export const load: PageServerLoad = async () => {
 
             characters,
 
-            rating: x.data.wins === null ? null : x.data.rating,
-            tier: x.data.wins === null ? "Unranked" : getTierFromRating(x.data.rating),
+            rating,
+            tier,
+
+            sets: x.data.sets,
 
             wins: x.data.wins,
             losses: x.data.losses
@@ -40,6 +55,15 @@ export const load: PageServerLoad = async () => {
 
         if (compareRating !== 0) {
             return compareRating;
+        }
+
+        // rating must be unranked or pending
+        if (a.tier !== b.tier) {
+            if (a.tier === "Pending") {
+                return -1;
+            } else {
+                return 1;
+            }
         }
 
         // wow...

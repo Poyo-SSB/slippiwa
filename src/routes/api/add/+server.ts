@@ -78,6 +78,8 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
 
         rating: slippiUser.rankedNetplayProfile.ratingOrdinal,
 
+        sets: slippiUser.rankedNetplayProfile.ratingUpdateCount,
+
         wins: slippiUser.rankedNetplayProfile.wins,
         losses: slippiUser.rankedNetplayProfile.losses
     }

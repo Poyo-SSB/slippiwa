@@ -18,6 +18,8 @@ export interface Player {
     rating: number | null;
     tier: Tier;
 
+    sets: number;
+
     wins: number | null;
     losses: number | null;
 }

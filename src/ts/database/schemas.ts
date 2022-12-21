@@ -18,6 +18,8 @@ export interface DatabasePlayerData {
 
     rating: number;
 
+    sets: number;
+
     wins: number | null;
     losses: number | null;
 }
