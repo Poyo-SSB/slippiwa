@@ -1,9 +1,10 @@
 import { slippiLimiter } from "$ts/state/limiter";
 
+import type { Character } from "$ts/types/character";
+import type { DatabasePlayerData } from "$ts/database/schemas";
+
 import get_id_by_code from "$gql/GetIdByCode.gql?raw";
 import get_player_by_id from "$gql/GetPlayerById.gql?raw";
-
-import type { Character } from "$ts/types/character";
 
 export async function getIdByCode(code: string): Promise<Response> {
     await slippiLimiter.removeTokens(1);
@@ -72,6 +73,38 @@ const slippiSlugMap: Record<string, Character> = {
     "ZELDA": "Zelda",
 };
 
-export function slippiCharacterToCharacter(slippi: string) {
+export function slippiCharacterToCharacter(slippi: string): Character {
     return slippiSlugMap[slippi];
+}
+
+export function slippiUserToDatabasePlayerData(slippiUser: any): DatabasePlayerData {
+    const totalGameCount = slippiUser.rankedNetplayProfile.characters
+        ?.map((x: any) => x.gameCount)
+        .reduce((a: number, b: number) => a + b, 0);
+
+    let wins = slippiUser.rankedNetplayProfile.wins;
+    let losses = slippiUser.rankedNetplayProfile.losses;
+
+    // in case a player has won but not lost/lost but not won yet
+    if (wins || losses) {
+        wins = wins ?? 0;
+        losses = losses ?? 0;
+    }
+
+    return {
+        slippi_code: slippiUser.connectCode.code,
+        slippi_name: slippiUser.displayName,
+
+        characters: slippiUser.rankedNetplayProfile.characters?.map((x: any) => ({
+            character: slippiCharacterToCharacter(x.character),
+            proportion: x.gameCount / totalGameCount
+        })),
+
+        rating: slippiUser.rankedNetplayProfile.ratingOrdinal,
+
+        sets: slippiUser.rankedNetplayProfile.ratingUpdateCount,
+
+        wins,
+        losses
+    };
 }

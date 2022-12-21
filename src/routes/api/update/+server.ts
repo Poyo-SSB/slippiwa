@@ -1,9 +1,9 @@
 import type { RequestEvent, RequestHandler } from "./$types";
 
-import type { DatabasePlayer, DatabasePlayerData, DatabaseStats } from "$ts/database/schemas";
+import type { DatabasePlayer, DatabaseStats } from "$ts/database/schemas";
 
 import { Receiver } from "@upstash/qstash";
-import { getPlayerById, slippiCharacterToCharacter } from "$ts/api/slippi";
+import { getPlayerById, slippiUserToDatabasePlayerData } from "$ts/api/slippi";
 import { respond } from "$ts/api/respond";
 
 import { API_SECRET, QSTASH_CURRENT_SIGNING_KEY, QSTASH_NEXT_SIGNING_KEY } from "$env/static/private";
@@ -63,37 +63,7 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
         const response = await getPlayerById(id);
         const slippiUser = (await response.json()).data.getUser;
 
-        const totalGameCount = slippiUser.rankedNetplayProfile.characters
-            ?.map((x: any) => x.gameCount)
-            .reduce((a: number, b: number) => a + b, 0);
-
-        let wins = slippiUser.rankedNetplayProfile.wins;
-        let losses = slippiUser.rankedNetplayProfile.losses;
-
-        // in case a player has won but not lost/lost but not won yet
-        if (wins || losses) {
-            wins = wins ?? 0;
-            losses = losses ?? 0;
-        }
-
-        const playerData: DatabasePlayerData = {
-            slippi_code: slippiUser.connectCode.code,
-            slippi_name: slippiUser.displayName,
-
-            characters: slippiUser.rankedNetplayProfile.characters?.map((x: any) => ({
-                character: slippiCharacterToCharacter(x.character),
-                proportion: x.gameCount / totalGameCount
-            })),
-
-            rating: slippiUser.rankedNetplayProfile.ratingOrdinal,
-
-            sets: slippiUser.rankedNetplayProfile.ratingUpdateCount,
-
-            wins,
-            losses
-        }
-
-        playersCollection.findOneAndUpdate({ id }, { $set: { data: playerData } });
+        playersCollection.findOneAndUpdate({ id }, { $set: { data: slippiUserToDatabasePlayerData(slippiUser) } });
     }
 
     const statsCollection = db.collection<DatabaseStats>("stats");

@@ -2,7 +2,7 @@ import type { RequestEvent, RequestHandler } from "./$types";
 
 import type { DatabaseBan, DatabasePlayer, DatabasePlayerData } from "$ts/database/schemas";
 
-import { getIdByCode, getPlayerById, slippiCharacterToCharacter } from "$ts/api/slippi";
+import { getIdByCode, getPlayerById, slippiUserToDatabasePlayerData } from "$ts/api/slippi";
 import { respond } from "$ts/api/respond";
 
 import dbPromise from "$ts/database/database";
@@ -61,41 +61,11 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
     const playerResponse = await getPlayerById(id);
     const slippiUser = (await playerResponse.json()).data.getUser;
 
-    const totalGameCount = slippiUser.rankedNetplayProfile.characters
-        ?.map((x: any) => x.gameCount)
-        .reduce((a: number, b: number) => a + b, 0);
-
-    let wins = slippiUser.rankedNetplayProfile.wins;
-    let losses = slippiUser.rankedNetplayProfile.losses;
-
-    // in case a player has won but not lost/lost but not won yet
-    if (wins || losses) {
-        wins = wins ?? 0;
-        losses = losses ?? 0;
-    }
-
-    const playerData: DatabasePlayerData = {
-        slippi_code: slippiUser.connectCode.code,
-        slippi_name: slippiUser.displayName,
-
-        characters: slippiUser.rankedNetplayProfile.characters?.map((x: any) => ({
-            character: slippiCharacterToCharacter(x.character),
-            proportion: x.gameCount / totalGameCount
-        })),
-
-        rating: slippiUser.rankedNetplayProfile.ratingOrdinal,
-
-        sets: slippiUser.rankedNetplayProfile.ratingUpdateCount,
-
-        wins,
-        losses
-    }
-
     const player: DatabasePlayer = {
         id,
         name: json.name,
 
-        data: playerData,
+        data: slippiUserToDatabasePlayerData(slippiUser),
 
         addedIp: event.getClientAddress(),
         addedDate: new Date()
