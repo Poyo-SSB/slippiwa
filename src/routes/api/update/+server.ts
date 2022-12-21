@@ -2,19 +2,33 @@ import type { RequestEvent, RequestHandler } from "./$types";
 
 import type { DatabasePlayer, DatabasePlayerData, DatabaseStats } from "$ts/database/schemas";
 
+import { Receiver } from "@upstash/qstash";
+
 import { slippiLimiter } from "$ts/state/limiter";
 
 import { getPlayerById, slippiCharacterToCharacter } from "$ts/api/slippi";
 import { respond } from "$ts/api/respond";
 
-import { API_SECRET } from "$env/static/private";
+import { API_SECRET, QSTASH_CURRENT_SIGNING_KEY, QSTASH_NEXT_SIGNING_KEY } from "$env/static/private";
 
 import dbPromise from "$ts/database/database";
+
+const qstash = new Receiver({
+    currentSigningKey: QSTASH_CURRENT_SIGNING_KEY,
+    nextSigningKey: QSTASH_NEXT_SIGNING_KEY,
+});
 
 // TODO: this is not scalable, at about 40 players this will start to time out
 // solution is to add a batching mechanism which github actions can hook into
 export const POST: RequestHandler = async (event: RequestEvent) => {
-    if (event.request.headers.get("authorization") !== `Bearer ${API_SECRET}`) {
+    let ok = event.request.headers.get("authorization") !== `Bearer ${API_SECRET}`;
+    
+    ok = ok || await qstash.verify({
+        signature: event.request.headers.get("upstash-signature") ?? "",
+        body: await event.request.text()
+    });
+
+    if (!ok) {
         return respond(401, {
             "status": "error",
             "message": "nice try"
