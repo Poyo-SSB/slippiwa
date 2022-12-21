@@ -11,6 +11,8 @@ import { API_SECRET } from "$env/static/private";
 
 import dbPromise from "$ts/database/database";
 
+// TODO: this is not scalable, at about 40 players this will start to time out
+// solution is to add a batching mechanism which github actions can hook into
 export const POST: RequestHandler = async (event: RequestEvent) => {
     if (event.request.headers.get("authorization") !== `Bearer ${API_SECRET}`) {
         return respond(401, {
@@ -19,14 +21,6 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
         });
     }
 
-    process(event); // intentionally not awaited!
-
-    return respond(202, {
-        "status": "success"
-    });
-};
-
-async function process(event: RequestEvent) {
     const db = await dbPromise;
 
     const playersCollection = db.collection<DatabasePlayer>("players");
@@ -63,5 +57,9 @@ async function process(event: RequestEvent) {
     }
 
     const statsCollection = db.collection<DatabaseStats>("stats");
-    statsCollection.findOneAndUpdate({}, { $set: { lastUpdate: new Date() } });
-}
+    await statsCollection.findOneAndUpdate({}, { $set: { lastUpdate: new Date() } });
+
+    return respond(200, {
+        "status": "success"
+    });
+};
