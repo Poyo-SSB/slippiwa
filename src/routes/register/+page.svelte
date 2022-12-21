@@ -50,7 +50,7 @@
             </tr>
             <tr>
                 <td>start.gg name</td>
-                <td><input bind:value={name} class:error={!nameValid} maxlength=16 placeholder="Plup"/></td>
+                <td><input bind:value={name} class:error={!nameValid} maxlength=24 placeholder="Plup"/></td>
             </tr>
         </table>
         <p>
