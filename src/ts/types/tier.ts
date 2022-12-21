@@ -45,7 +45,7 @@ const ratingMap: RatingBracket[] = [
     { rating: 1054.87, tier: "Silver 1" },
     { rating: 913.72, tier: "Bronze 3" },
     { rating: 765.43, tier: "Bronze 2" },
-    { rating: 765.43, tier: "Bronze 1" }
+    { rating: 0, tier: "Bronze 1" }
 ];
 
 const slugMap: Record<Tier, string> = {
