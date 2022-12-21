@@ -2,8 +2,6 @@ import type { RequestEvent, RequestHandler } from "./$types";
 
 import type { DatabaseBan, DatabasePlayer, DatabasePlayerData } from "$ts/database/schemas";
 
-import { slippiLimiter } from "$ts/state/limiter";
-
 import { getIdByCode, getPlayerById, slippiCharacterToCharacter } from "$ts/api/slippi";
 import { respond } from "$ts/api/respond";
 
@@ -40,8 +38,6 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
     console.log(`Trying to add ${json.name} (${json.code})...`);
 
     const collection = db.collection<DatabasePlayer>("players");
-
-    await slippiLimiter.removeTokens(1);
 
     const response = await getIdByCode(json.code);
     const data = (await response.json()).data;

@@ -3,9 +3,6 @@ import type { RequestEvent, RequestHandler } from "./$types";
 import type { DatabasePlayer, DatabasePlayerData, DatabaseStats } from "$ts/database/schemas";
 
 import { Receiver } from "@upstash/qstash";
-
-import { slippiLimiter } from "$ts/state/limiter";
-
 import { getPlayerById, slippiCharacterToCharacter } from "$ts/api/slippi";
 import { respond } from "$ts/api/respond";
 
@@ -63,8 +60,6 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
     }
 
     for (const id of currentIds) {
-        await slippiLimiter.removeTokens(1);
-
         const response = await getPlayerById(id);
         const slippiUser = (await response.json()).data.getUser;
 

@@ -1,9 +1,13 @@
+import { slippiLimiter } from "$ts/state/limiter";
+
 import get_id_by_code from "$gql/GetIdByCode.gql?raw";
 import get_player_by_id from "$gql/GetPlayerById.gql?raw";
 
 import type { Character } from "$ts/types/character";
 
 export async function getIdByCode(code: string): Promise<Response> {
+    await slippiLimiter.removeTokens(1);
+
     return await fetch("https://gql-gateway-dot-slippi.uc.r.appspot.com/graphql", {
         "headers": {
             "Cache-Control": "no-cache",
@@ -21,6 +25,8 @@ export async function getIdByCode(code: string): Promise<Response> {
 }
 
 export async function getPlayerById(id: string): Promise<Response> {
+    await slippiLimiter.removeTokens(1);
+
     return await fetch("https://gql-gateway-dot-slippi.uc.r.appspot.com/graphql", {
         "headers": {
             "Cache-Control": "no-cache",
