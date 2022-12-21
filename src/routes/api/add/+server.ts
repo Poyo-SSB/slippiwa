@@ -37,6 +37,8 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
         });
     }
 
+    console.log(`Trying to add ${json.name} (${json.code})...`);
+
     const collection = db.collection<DatabasePlayer>("players");
 
     await slippiLimiter.removeTokens(1);
@@ -67,6 +69,15 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
         ?.map((x: any) => x.gameCount)
         .reduce((a: number, b: number) => a + b, 0);
 
+    let wins = slippiUser.rankedNetplayProfile.wins;
+    let losses = slippiUser.rankedNetplayProfile.losses;
+
+    // in case a player has won but not lost/lost but not won yet
+    if (wins || losses) {
+        wins = wins ?? 0;
+        losses = losses ?? 0;
+    }
+
     const playerData: DatabasePlayerData = {
         slippi_code: slippiUser.connectCode.code,
         slippi_name: slippiUser.displayName,
@@ -80,8 +91,8 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
 
         sets: slippiUser.rankedNetplayProfile.ratingUpdateCount,
 
-        wins: slippiUser.rankedNetplayProfile.wins,
-        losses: slippiUser.rankedNetplayProfile.losses
+        wins,
+        losses
     }
 
     const player: DatabasePlayer = {
