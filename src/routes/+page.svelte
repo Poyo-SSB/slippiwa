@@ -84,7 +84,7 @@
                     {player.rating?.toFixed(1) ?? "⸻"}
                     <img src="/ranks/{getSlugFromTier(player.tier)}.svg" class="tier" alt="{player.tier}" title="{player.tier}"/>
                 </td>
-                <td class="wl"><span class:wins={player.wins}>{player.wins ?? "⸺"}</span> <span class="slash">/</span> <span class:losses={player.losses}>{player.losses ?? "⸺"}</span></td>
+                <td class="wl"><span class:wins={player.wins !== null}>{player.wins ?? "⸺"}</span> <span class="slash">/</span> <span class:losses={player.losses !== null}>{player.losses ?? "⸺"}</span></td>
             </tr>
         {/each}
     </tbody>
