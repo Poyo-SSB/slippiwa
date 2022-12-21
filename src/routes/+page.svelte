@@ -61,7 +61,7 @@
     <tbody>
         {#each players as player, i}
             <tr class="animate" style="animation: none;">
-                <td class="rank">{i + 1}</td>
+                <td class="rank">{player.rating ? i + 1 : "—"}</td>
                 <td class="player">
                     <!-- svelte-ignore a11y-missing-content -->
                     <a class="anchor" name={slug(player)} />
