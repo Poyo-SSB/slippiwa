@@ -76,6 +76,11 @@ export const load: PageServerLoad = async () => {
     });
 
     const statsCollection = db.collection<DatabaseStats>("stats");
+
+    if (!await statsCollection.countDocuments()) {
+        await statsCollection.insertOne({ lastUpdate: new Date(0) });
+    }
+
     const lastUpdate = (await statsCollection.findOne({}))!.lastUpdate;
 
     return {

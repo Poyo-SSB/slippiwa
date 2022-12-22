@@ -67,6 +67,11 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
     }
 
     const statsCollection = db.collection<DatabaseStats>("stats");
+
+    if (!(await statsCollection.countDocuments())) {
+        statsCollection.insertOne({ lastUpdate: new Date(0) });
+    }
+
     await statsCollection.findOneAndUpdate({}, { $set: { lastUpdate: new Date() } });
 
     if (ids.length) {
