@@ -1,8 +1,8 @@
 import type { RequestEvent, RequestHandler } from "./$types";
 
-import type { DatabaseBan, DatabasePlayer, DatabasePlayerData } from "$ts/database/schemas";
+import type { DatabaseBan, DatabasePlayer } from "$ts/database/schemas";
 
-import { getIdByCode, getPlayerById, slippiUserToDatabasePlayerData } from "$ts/api/slippi";
+import { getIdByCode, getPlayersById } from "$ts/api/slippi";
 import { respond } from "$ts/api/respond";
 
 import dbPromise from "$ts/database/database";
@@ -39,17 +39,14 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
 
     const collection = db.collection<DatabasePlayer>("players");
 
-    const response = await getIdByCode(json.code);
-    const data = (await response.json()).data;
+    const id = await getIdByCode(json.code);
 
-    if (!data.getConnectCode) {
+    if (!id) {
         return respond(404, {
             "status": "error",
             "message": "Player not found!"
         });
     }
-
-    const id = data.getConnectCode.user.fbUid;
 
     if (await collection.findOne({ id })) {
         return respond(409, {
@@ -58,14 +55,13 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
         });
     }
 
-    const playerResponse = await getPlayerById(id);
-    const slippiUser = (await playerResponse.json()).data.getUser;
+    const playerData = await getPlayersById([id]);
 
     const player: DatabasePlayer = {
         id,
         name: json.name,
 
-        data: slippiUserToDatabasePlayerData(slippiUser),
+        data: playerData[0],
 
         addedIp: event.getClientAddress(),
         addedDate: new Date()
@@ -76,7 +72,7 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
     return respond(201, {
         "status": "success",
         "data": {
-            "slug": slippiUser.connectCode.code.toLowerCase().replace("#", "-")
+            "slug": playerData[0].slippi_code.toLowerCase().replace("#", "-")
         }
     });
 }

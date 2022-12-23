@@ -3,14 +3,14 @@ import type { RequestEvent, RequestHandler } from "./$types";
 import type { DatabasePlayer, DatabaseStats } from "$ts/database/schemas";
 
 import { Receiver } from "@upstash/qstash";
-import { getPlayerById, slippiUserToDatabasePlayerData } from "$ts/api/slippi";
+import { getPlayersById } from "$ts/api/slippi";
 import { respond } from "$ts/api/respond";
 
 import { API_SECRET, QSTASH_CURRENT_SIGNING_KEY, QSTASH_NEXT_SIGNING_KEY } from "$env/static/private";
 
 import dbPromise from "$ts/database/database";
 
-const batch_size = 5;
+const batch_size = 25;
 
 const qstash = new Receiver({
     currentSigningKey: QSTASH_CURRENT_SIGNING_KEY,
@@ -34,36 +34,23 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
 
     const db = await dbPromise;
 
-    let json: any;
-
-    try {
-        json = await event.request.json();
-    } catch { }
-
     const playersCollection = db.collection<DatabasePlayer>("players");
 
-    let ids: string[];
+    const players = await playersCollection.find().toArray();
+    const ids = players.map(x => x.id);
 
-    if (json?.ids) {
-        ids = json.ids;
-    } else {
-        const players = await playersCollection.find().toArray();
-        ids = players.map(x => x.id);
-    }
+    while (ids.length) {
+        const currentIds = [];
+        
+        for (let i = 0; i < batch_size && ids.length; i++) {
+            currentIds.push(ids.shift()!);
+        }
 
-    console.log(`Updating players, ${ids.length} left...`);
+        const players = await getPlayersById(currentIds);
 
-    const currentIds: string[] = [];
-
-    for (let i = 0; i < batch_size && ids.length; i++) {
-        currentIds.push(ids.shift()!);
-    }
-
-    for (const id of currentIds) {
-        const response = await getPlayerById(id);
-        const slippiUser = (await response.json()).data.getUser;
-
-        playersCollection.findOneAndUpdate({ id }, { $set: { data: slippiUserToDatabasePlayerData(slippiUser) } });
+        for (let i = 0; i < currentIds.length; i++) {
+            playersCollection.findOneAndUpdate({ id: currentIds[i] }, { $set: { data: players[i] } });
+        }
     }
 
     const statsCollection = db.collection<DatabaseStats>("stats");
@@ -73,19 +60,6 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
     }
 
     await statsCollection.findOneAndUpdate({}, { $set: { lastUpdate: new Date() } });
-
-    if (ids.length) {
-        event.fetch("/api/update", {
-            "headers": {
-                "Authorization": `Bearer ${API_SECRET}`,
-                "Content-Type": "application/json"
-            },
-            "body": JSON.stringify({ ids }),
-            "method": "POST"
-        });
-    } else {
-        console.log("Done updating!");
-    }
 
     return respond(200, {
         "status": "success"
