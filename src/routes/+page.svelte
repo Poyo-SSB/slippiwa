@@ -15,6 +15,14 @@
 
     export let data: PageData;
 
+    const otherLeaderboards = [
+        { code: "az", name: "Arizona", url: "https://joemama0s.github.io/AZSlippiLeaderboard/#/" },
+        { code: "ca", name: "Norcal", url: "https://costasford.github.io/NorcalSlippiLeaderboard/#/" },
+        { code: "co", name: "Colorado", url: "https://grantismo.github.io/CoSlippiLeaderboard/#/" },
+        { code: "sd", name: "Siouxland", url: "https://melangestillraces.github.io/SiouxlandSlippiLeaderboard/#/" },
+        { code: "qc", name: "Quebec", url: "https://tokage2000.github.io/QCSlippiLeaderboard/#/" },
+    ];
+
     const players = data.players;
     const lastUpdate = DateTime.fromJSDate(data.lastUpdate);
 
@@ -45,7 +53,7 @@
 </svelte:head>
 
 <!-- svelte-ignore a11y-missing-attribute -->
-<h1><img src="/flag.svg" class="flag"/>Washington Slippi Leaderboard</h1>
+<h1><img src="/flags/wa.svg" class="flag"/>Washington Slippi Leaderboard</h1>
 <p class="ago">Last updated {ago}</p>
 
 <table>
@@ -90,6 +98,16 @@
     </tbody>
 </table>
 
+<!-- svelte-ignore a11y-missing-attribute -->
+<div class="navigation">
+    <p>Other leaderboards</p>
+    <ul>
+        {#each otherLeaderboards as leaderboard}
+            <a href={leaderboard.url}><li><img src="/flags/{leaderboard.code}.svg" class="flag"/> {leaderboard.name}</li></a>    
+        {/each}
+    </ul>
+</div>
+
 <style>
     .flag {
         display: inline-block;
@@ -112,6 +130,50 @@
         color: var(--color-foreground-dark);
     }
 
+    .navigation {
+        background-color: var(--color-background-light);
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    
+    .navigation .flag {
+        height: 1em;
+    }
+
+    .navigation > p {
+        font-weight: 500;
+    }
+
+    .navigation > ul {
+        list-style: none;
+        display: none;
+    }
+
+    .navigation:hover > ul {
+        display: unset;
+    }
+
+    .navigation > ul, .navigation > p {
+        margin: 0;
+        padding: 0;
+    }
+
+    .navigation li {
+        border-top: 1px solid var(--color-background);
+    }
+
+    .navigation li:hover {
+        background-color: var(--color-background-lighter);
+        color: var(--color-foreground);
+    }
+
+    .navigation li, .navigation > p {
+        padding: 12px 24px;
+    }
+
     .anchor {
         position: absolute;
         top: -12px;
@@ -121,8 +183,7 @@
     table {
         width: 100%;
         max-width: 940px;
-        margin: auto;
-        margin-top: 26px;
+        margin: 26px auto 24px;
         background-color: var(--color-background-light);
         border-radius: 4px;
         table-layout: fixed;
@@ -275,6 +336,12 @@
     mess with columns by width, for mobile etc.
     sorry i don't have a better solution than just hiding as things get smaller
     */
+
+    @media (max-width: 1200px) {
+        .navigation {
+            display: none;
+        }
+    }
 
     @media (max-width: 940px) {
         .tier {
