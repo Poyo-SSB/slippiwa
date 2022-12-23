@@ -26,7 +26,7 @@ export async function getIdByCode(code: string): Promise<string | null> {
 
     const data = (await response.json()).data;
 
-    if (!data.connectCode) {
+    if (!data.getConnectCode) {
         return null;
     }
 

@@ -39,6 +39,8 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
     const players = await playersCollection.find().toArray();
     const ids = players.map(x => x.id);
 
+    console.log(`Updating ${ids.length} players...`);
+
     while (ids.length) {
         const currentIds = [];
         
@@ -60,6 +62,8 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
     }
 
     await statsCollection.findOneAndUpdate({}, { $set: { lastUpdate: new Date() } });
+
+    console.log(`Done updating.`);
 
     return respond(200, {
         "status": "success"
