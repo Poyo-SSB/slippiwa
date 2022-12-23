@@ -12,7 +12,7 @@ managing the database currently has no frontend and will require mongodb compass
 - `QSTASH_CURRENT_SIGNING_KEY`: i use qstash to post to the /api/update endpoint every two hours
 - `QSTASH_NEXT_SIGNING_KEY`: these are used to verify that a request is actually coming from qstash!
 
-- `PUBLIC_CONTACT`: who do people contact when
+- `PUBLIC_CONTACT`: contact listed on the /register endpoint
 
 ## github secrets
 
