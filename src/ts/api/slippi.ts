@@ -3,13 +3,13 @@ import { slippiLimiter } from "$ts/state/limiter";
 import type { Character } from "$ts/types/character";
 import type { DatabasePlayerData } from "$ts/database/schemas";
 
+import fragment_player from "$gql/FragmentPlayer.gql?raw";
 import get_id_by_code from "$gql/GetIdByCode.gql?raw";
-import get_player_by_id from "$gql/GetPlayerById.gql?raw";
 
-export async function getIdByCode(code: string): Promise<Response> {
+export async function getIdByCode(code: string): Promise<string | null> {
     await slippiLimiter.removeTokens(1);
 
-    return await fetch("https://gql-gateway-dot-slippi.uc.r.appspot.com/graphql", {
+    const response = await fetch("https://gql-gateway-dot-slippi.uc.r.appspot.com/graphql", {
         "headers": {
             "Cache-Control": "no-cache",
             "Content-Type": "application/json"
@@ -23,25 +23,53 @@ export async function getIdByCode(code: string): Promise<Response> {
         }),
         "method": "POST"
     });
+
+    const data = (await response.json()).data;
+
+    if (!data.connectCode) {
+        return null;
+    }
+
+    return data.getConnectCode.user.fbUid;
 }
 
-export async function getPlayerById(id: string): Promise<Response> {
+// horrible batching mechanism
+export async function getPlayersById(ids: string[]): Promise<DatabasePlayerData[]> {
     await slippiLimiter.removeTokens(1);
 
-    return await fetch("https://gql-gateway-dot-slippi.uc.r.appspot.com/graphql", {
+    const queryParams = ids.map((_, i) => `$i${i}: String!`).join(", ");
+    const aliases = ids.map((_, i) => `u${i}: getUser(fbUid: $i${i}) { ...Player }`).join("\n");
+
+    const query = fragment_player + `query GetPlayersById(${queryParams}) { ${aliases} }`;
+
+    const variables: any = {};
+
+    for (let i = 0; i < ids.length; i++) {
+        variables["i" + i] = ids[i];
+    }
+
+    const response = await fetch("https://gql-gateway-dot-slippi.uc.r.appspot.com/graphql", {
         "headers": {
             "Cache-Control": "no-cache",
             "Content-Type": "application/json"
         },
         "body": JSON.stringify({
-            operationName: "GetPlayerById",
-            query: get_player_by_id,
-            variables: {
-                id
-            }
+            operationName: "GetPlayersById",
+            query,
+            variables
         }),
         "method": "POST"
     });
+
+    const data = (await response.json()).data;
+
+    const players: DatabasePlayerData[] = [];
+
+    for (let i = 0; i < ids.length; i++) {
+        players.push(slippiUserToDatabasePlayerData(data["u" + i]));
+    }
+
+    return players;
 }
 
 const slippiSlugMap: Record<string, Character> = {
@@ -73,11 +101,11 @@ const slippiSlugMap: Record<string, Character> = {
     "ZELDA": "Zelda",
 };
 
-export function slippiCharacterToCharacter(slippi: string): Character {
+function slippiCharacterToCharacter(slippi: string): Character {
     return slippiSlugMap[slippi];
 }
 
-export function slippiUserToDatabasePlayerData(slippiUser: any): DatabasePlayerData {
+function slippiUserToDatabasePlayerData(slippiUser: any): DatabasePlayerData {
     const totalGameCount = slippiUser.rankedNetplayProfile.characters
         ?.map((x: any) => x.gameCount)
         .reduce((a: number, b: number) => a + b, 0);

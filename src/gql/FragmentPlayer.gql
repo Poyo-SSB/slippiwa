@@ -1,0 +1,18 @@
+fragment Player on User {
+  displayName
+  connectCode {
+    code
+  }
+  status
+  rankedNetplayProfile {
+    ratingOrdinal
+    ratingUpdateCount
+    wins
+    losses
+    continent
+    characters {
+      character
+      gameCount
+    }
+  }
+}
