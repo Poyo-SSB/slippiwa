@@ -17,11 +17,11 @@
 
     const otherLeaderboards = [
         { code: "az", name: "Arizona", url: "https://joemama0s.github.io/AZSlippiLeaderboard/#/" },
-        { code: "bc", name: "British Columbia", url: "https://bcslippi.saikacat.repl.co/" },
+        { code: "bc", name: "British Columbia", url: "https://slippi.saika.ca/" },
         { code: "ca", name: "Norcal", url: "https://costasford.github.io/NorcalSlippiLeaderboard/#/" },
         { code: "co", name: "Colorado", url: "https://grantismo.github.io/CoSlippiLeaderboard/#/" },
-        { code: "sd", name: "Siouxland", url: "https://melangestillraces.github.io/SiouxlandSlippiLeaderboard/#/" },
         { code: "qc", name: "Quebec", url: "https://tokage2000.github.io/QCSlippiLeaderboard/#/" },
+        { code: "sd", name: "Siouxland", url: "https://melangestillraces.github.io/SiouxlandSlippiLeaderboard/#/" },
     ];
 
     const players = data.players;
