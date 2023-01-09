@@ -16,12 +16,22 @@
     export let data: PageData;
 
     const otherLeaderboards = [
-        { code: "az", name: "Arizona", url: "https://joemama0s.github.io/AZSlippiLeaderboard/#/" },
-        { code: "bc", name: "British Columbia", url: "https://slippi.saika.ca/" },
-        { code: "ca", name: "Norcal", url: "https://costasford.github.io/NorcalSlippiLeaderboard/#/" },
-        { code: "co", name: "Colorado", url: "https://grantismo.github.io/CoSlippiLeaderboard/#/" },
-        { code: "qc", name: "Quebec", url: "https://tokage2000.github.io/QCSlippiLeaderboard/#/" },
-        { code: "sd", name: "Siouxland", url: "https://melangestillraces.github.io/SiouxlandSlippiLeaderboard/#/" },
+        { code: "us_az", name: "Arizona", url: "https://joemama0s.github.io/AZSlippiLeaderboard/#/" },
+        { code: "us_ar", name: "Arkansas", url: "https://smaneil.github.io/ArSlippiLeaderboard/#/" },
+        { code: "ca_bc", name: "British Columbia", url: "https://slippi.saika.ca/" },
+        { code: "us_co", name: "Colorado", url: "https://grantismo.github.io/CoSlippiLeaderboard/#/" },
+        { code: "us_in", name: "Indiana", url: "https://freemanb2.github.io/InSlippiLeaderboard/#/" },
+        { code: "us_ia", name: "Iowa", url: "https://teolandon.github.io/IaSlippiLeaderboard/#/" },
+        { code: "us_mo", name: "Missouri", url: "https://timtempor.github.io/MOSlippiLeaderboard/#/" },
+        { code: "us_ca", name: "Norcal", url: "https://costasford.github.io/NorcalSlippiLeaderboard/#/" },
+        { code: "us_ne", name: "New England", url: "https://benjaminsg.github.io/NESlippiLeaderboard/#/" },
+        { code: "us_nm", name: "New Mexico", url: "https://izzythecubemaster.github.io/NMSlippiLeaderboard/#/" },
+        { code: "ca_qc", name: "Quebec", url: "https://tokage2000.github.io/QCSlippiLeaderboard/#/" },
+        { code: "uk_ab", name: "Scotland", url: "https://melee-leaderboards.github.io/Scotland/" },
+        { code: null, name: "Siouxland", url: "https://melangestillraces.github.io/SiouxlandSlippiLeaderboard/#/" },
+        { code: null, name: "South America", url: "https://caioicy.github.io/slippi-leaderboard-sa/#/" },
+        { code: "us_tx", name: "Texas", url: "https://timothysdavis00.github.io/TXSlippiLeaderboard/#/" },
+        { code: "uk", name: "United Kingdom", url: "https://spirrit.github.io/UKSlippiLeaderboard/#/" },
     ];
 
     const players = data.players;
@@ -54,7 +64,7 @@
 </svelte:head>
 
 <!-- svelte-ignore a11y-missing-attribute -->
-<h1><img src="/flags/wa.svg" class="flag"/>Washington Slippi Leaderboard</h1>
+<h1><img src="/flags/us_wa.svg" class="flag"/>Washington Slippi Leaderboard</h1>
 <p class="ago">Last updated {ago}</p>
 
 <table>
@@ -73,7 +83,7 @@
                 <td class="rank">{player.rating ? i + 1 : "—"}</td>
                 <td class="player">
                     <!-- svelte-ignore a11y-missing-content -->
-                    <a class="anchor" name={slug(player)} />
+                    <a class="anchor" id={slug(player)} />
                     <p class="name"><a href="https://slippi.gg/user/{slug(player)}">{player.name}</a></p>
                     <p class="slippi">
                         <span class="slippi-tag">{player.slippiTag}#{player.slippiDiscriminator}</span>
@@ -104,7 +114,11 @@
     <p>Other leaderboards</p>
     <ul>
         {#each otherLeaderboards as leaderboard}
-            <a href={leaderboard.url}><li><img src="/flags/{leaderboard.code}.svg" class="flag"/> {leaderboard.name}</li></a>    
+            <a href={leaderboard.url}><li>
+                {#if leaderboard.code}
+                    <img src="/flags/{leaderboard.code}.svg" class="flag"/>
+                {/if}
+                {leaderboard.name}</li></a>    
         {/each}
     </ul>
 </div>
@@ -137,27 +151,28 @@
         top: 16px;
         left: 16px;
         border-radius: 15px;
-        overflow: hidden;
+        max-height: calc(100vh - 32px);
+        overflow: auto;
     }
     
     .navigation .flag {
         height: 1em;
     }
 
-    .navigation > p {
+    .navigation p {
         font-weight: 500;
     }
 
-    .navigation > ul {
+    .navigation ul {
         list-style: none;
         display: none;
     }
 
-    .navigation:hover > ul {
+    .navigation:hover ul {
         display: unset;
     }
 
-    .navigation > ul, .navigation > p {
+    .navigation ul, .navigation p {
         margin: 0;
         padding: 0;
     }
@@ -171,7 +186,7 @@
         color: var(--color-foreground);
     }
 
-    .navigation li, .navigation > p {
+    .navigation li, .navigation p {
         padding: 12px 24px;
     }
 
