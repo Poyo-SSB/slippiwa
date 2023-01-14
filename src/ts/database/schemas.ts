@@ -16,6 +16,7 @@ export interface DatabasePlayerData {
 
     characters: DatabasePlayerDataCharacters[];
 
+    globalPlacement: number;
     rating: number;
 
     sets: number;

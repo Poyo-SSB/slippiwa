@@ -128,6 +128,7 @@ function slippiUserToDatabasePlayerData(slippiUser: any): DatabasePlayerData {
             proportion: x.gameCount / totalGameCount
         })),
 
+        globalPlacement: slippiUser.rankedNetplayProfile.dailyGlobalPlacement,
         rating: slippiUser.rankedNetplayProfile.ratingOrdinal,
 
         sets: slippiUser.rankedNetplayProfile.ratingUpdateCount,

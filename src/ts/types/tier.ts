@@ -28,7 +28,6 @@ type RatingBracket = {
 
 // this will probably go out of date pretty quickly
 const ratingMap: RatingBracket[] = [
-    { rating: 2191.75, tier: "Grandmaster" },
     { rating: 2350, tier: "Master 3" },
     { rating: 2275, tier: "Master 2" },
     { rating: 2191.75, tier: "Master 1" },
