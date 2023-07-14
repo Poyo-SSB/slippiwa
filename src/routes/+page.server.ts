@@ -24,7 +24,7 @@ export const load: PageServerLoad = async () => {
         if (x.data.wins !== null) {
             if (x.data.sets < 5) {
                 tier = "Pending";
-            } else if (x.data.globalPlacement !== null) {
+            } else if (x.data.globalPlacement !== null && x.data.rating >= 2191.75) {
                 tier = "Grandmaster";
             } else {
                 tier = getTierFromRating(x.data.rating);
