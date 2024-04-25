@@ -10,7 +10,7 @@ import { API_SECRET, QSTASH_CURRENT_SIGNING_KEY, QSTASH_NEXT_SIGNING_KEY } from 
 
 import dbPromise from "$ts/database/database";
 
-const batch_size = 25;
+const batch_size = 30;
 
 const qstash = new Receiver({
     currentSigningKey: QSTASH_CURRENT_SIGNING_KEY,

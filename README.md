@@ -16,7 +16,7 @@ managing the database currently has no frontend and will require mongodb compass
 
 ## github secrets
 
-- `API_SECRET`
+- `API_SECRET`: api secret from above!
 - `API_UPDATE_URL`: the live endpoint to post to, for manual github actions
 
 ## mongo
